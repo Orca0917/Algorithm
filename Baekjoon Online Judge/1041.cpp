@@ -19,5 +19,6 @@ int main() {
     ll answer = 1LL * corner * 4 + 1LL * (n - 2) * (n - 2) * 5 * minVal + (n - 2) * 8 * edge + 1LL * 4 * edge + 1LL * (n - 2) * 4 * minVal;
     if (n == 1) cout << accumulate(a.begin(), a.end(), 0) - *max_element(a.begin(), a.end()) << "\n";
     else cout << answer << "\n";
+    
     return 0;
 }
