@@ -1,2 +1,3 @@
 *.exe
 /Codeforces/.cph
+.vscode
