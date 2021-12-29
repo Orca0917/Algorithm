@@ -12,32 +12,37 @@ int main() {
     int testcase; cin >> testcase;
     while (testcase--) {
         int n; cin >> n;
-        vector<ll> H(n);
-        for (ll &h : H) cin >> h;
+        vector<int> H(n);
+        for (int &h : H) cin >> h;
 
-        auto check = [n, H](ll x, vector<ll> P) {
+        auto check = [n, H](const int x) -> bool {
+            // 연산에 사용하기 위한 복사본 생성
+            vector<int> P = H;
 
             for (int i = n - 1; i >= 2; --i) {
                 if (P[i] < x) return false;
+
+                // 앞, 앞앞 주머니에 줄 수 있는 조약돌 수
                 int extra = min(P[i] - x, H[i]);
                 int d = extra / 3;
 
-                P[i - 2] += d * 2;
+                P[i - 2] += 2 * d;
                 P[i - 1] += d;
                 P[i] -= 3 * d;
             }
 
             for (int i = 0; i < n; ++i) if (P[i] < x) return false;
+
             return true;
         };
 
-        ll lo = 1, hi = 1e9;
-        ll ans = 1;
+        int lo = 1, hi = 1e9;
+        int ans = 1;
 
         while (lo <= hi) {
-            ll mid = (lo + hi) / 2;
+            int mid = (lo + hi) / 2;
             // cout << "mid = " << mid << " >> " << check(mid, H) << "\n";
-            if (check(mid, H)) {
+            if (check(mid)) {
                 ans = mid;
                 lo = mid + 1;
             } else {
