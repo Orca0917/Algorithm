@@ -3,49 +3,59 @@
 #define pii pair<int, int>
 
 using namespace std;
-
-int n, m;
-vector<int> adj[10005];
-vector<int> discovered(10005, -1), sccid(10005, -1);
+const int max_vertex = 5000 * 2 + 2;
+vector<int> discovered(max_vertex, -1), sccid(max_vertex, -1);
+vector<int> adj[max_vertex];
 stack<int> st;
-int disnum = 0, sccnum = 0;
+
+int discoverNum = 0, sccNum = 0;
+int n, m;
 
 int scc(int here) {
-    int ret = discovered[here] = disnum++;
+    int ret = discovered[here] = discoverNum++;
     st.push(here);
 
     for (int there : adj[here]) {
-        if (discovered[there] == -1)
-            ret = min(ret, scc(there));
-        else if (sccid[there] == -1)
-            ret = min(ret, discovered[there]);
+        if (discovered[there] == -1) ret = min(ret, scc(there));
+        else if (sccid[there] == -1) ret = min(ret, discovered[there]);
     }
 
     if (ret == discovered[here]) {
         while (true) {
             int x = st.top(); st.pop();
-            sccid[x] = sccnum;
-            if (here == x) break;
+            sccid[x] = sccNum;
+            if (x == here) break;
         }
-        ++sccnum;
+        ++sccNum;
     }
 
     return ret;
 }
 
-bool tarjanSCC() {
-    for (int i = 2; i <= 2 * n + 1; ++i) {
-        if (discovered[i] == -1) 
-            scc(i);
-    }
+vector<int> tarjanSCC() {
+    for (int node = 2; node <= 2 * n + 1; ++node)
+        if (discovered[node] == -1)
+            scc(node);
 
-    for (int i = 2; i <= 2 * n; i += 2) {
-        if (sccid[i] == sccid[i + 1]) {
-            return false;
-        }
-    }
+    for (int i = 2; i <= n * 2; i += 2)
+        if (sccid[i] == sccid[i + 1])
+            return vector<int> ();
 
-    return true;
+    vector<int> result(n + 1, -1);
+    vector<pii> order;
+    for (int i = 1; i <= 2 * n + 1; ++i)
+        order.push_back({-sccid[i], i});
+    sort(order.begin(), order.end());
+
+    for (int i = 0; i < (int)order.size(); ++i) {
+        int node = order[i].second / 2;
+        int isTrue = order[i].second % 2 == 0;
+
+        if (result[node] != -1) continue;
+        result[node] = !isTrue;
+    }
+    
+    return result;
 }
 
 int main() {
@@ -54,70 +64,47 @@ int main() {
     cout.tie(nullptr);
     
     cin >> n >> m;
+    
+    vector<int> selection(3);
+    char color;
 
-    vector<int> selected(3);
-    vector<char> color(3);
+    auto getNode = [](int x) -> pii {
+        int notx;
+        if (x < 0) {
+            x = -x * 2 + 1;
+            notx = x - 1;
+        } else {
+            x = x * 2;
+            notx = x + 1;
+        }
+        return {x, notx};
+    };
 
     for (int i = 0; i < m; ++i) {
-
         for (int j = 0; j < 3; ++j) {
-            cin >> selected[j] >> color[j];
-            if (color[j] == 'R') selected[j] = -selected[j];
+            cin >> selection[j] >> color;
+            if (color == 'R') selection[j] *= -1;
         }
 
-        auto getNode = [](int x) -> pii {
-            int notx;
+        pii s1 = getNode(selection[0]);
+        pii s2 = getNode(selection[1]);
+        pii s3 = getNode(selection[2]);
 
-            if (x < 0) {
-                x = -x * 2 + 1;
-                notx = x - 1;
-            } else {
-                x = x * 2;
-                notx = x + 1;
-            }
-
-            return {x, notx};
-        };
-
-        pii s1 = getNode(selected[0]);
-        pii s2 = getNode(selected[1]);
-        pii s3 = getNode(selected[2]);
-
-        adj[s1.second].push_back(s2.first);
-        adj[s1.second].push_back(s3.first);
-
-        adj[s2.second].push_back(s1.first);
-        adj[s2.second].push_back(s3.first);
-
-        adj[s3.second].push_back(s1.first);
-        adj[s3.second].push_back(s2.first);
-
+        adj[s1.second].emplace_back(s2.first);
+        adj[s1.second].emplace_back(s3.first);
+        adj[s2.second].emplace_back(s1.first);
+        adj[s2.second].emplace_back(s3.first);
+        adj[s3.second].emplace_back(s1.first);
+        adj[s3.second].emplace_back(s2.first);
     }
 
-    bool result = tarjanSCC();
-
-    if (result) {
-        vector<int> value(2 * n + 2, -1);
-        vector<pii> order;
-        for (int i = 1; i <= 2 * n + 1; ++i)
-            order.push_back({-sccid[i], i});
-        sort(order.begin(), order.end());
-
-        for (int i = 0; i <= order.size(); ++i) {
-            int vertex = order[i].second;
-            int var = vertex / 2;
-            bool isTrue = vertex % 2 == 0;
-            if (value[var] != -1) continue;
-            value[var] = !isTrue;
-        }
-
-        for (int i = 1; i <= n; ++i) {
-            if (value[i] == 0) cout << 'R';
-            else cout << 'B';
-        }
+    vector<int> answer = tarjanSCC();
+    if (answer.size() == 0) cout << "-1\n";
+    else {
+        for (int i = 1; i <= n; ++i)
+            if (answer[i] == 0) cout << 'R';
+            else if (answer[i] == 1) cout << 'B';
         cout << "\n";
-    } else {
-        cout << "-1\n";
     }
 
     return 0;
