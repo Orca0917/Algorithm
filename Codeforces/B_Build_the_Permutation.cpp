@@ -16,8 +16,8 @@ int main() {
         if (abs(a - b) > 1 || a + b + 2 > n) {
             cout << "-1\n";
             continue;
-        } 
-
+        }
+        
         int number;
         vector<int> answer(n);
 
