@@ -38,3 +38,13 @@ int main() {
     cout << dq.front().first << "\n";
     return 0;
 }
+
+int func2(int a, int b) {
+    return a * b;
+}
+
+int main() {
+    int a = 3, b = 5;
+
+    return 0;
+}
