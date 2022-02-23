@@ -14,49 +14,22 @@ struct quad{
 int n, m;
 int board[105][105];
 int visits[105][105][5];
+int next_direction[2][5] = {{0, 4, 3, 1, 2}, {0, 3, 4, 2, 1}};
 quad start, finish;
 int answer = 1e9;
 
 int get_nextDir(int now_dir, int option) {
-    // 왼쪽
-    if (option == 0) {
-        if (now_dir == 1) {
-            now_dir = 4;
-        } else if (now_dir == 2) {
-            now_dir = 3;
-        } else if (now_dir == 3) {
-            now_dir = 1;
-        } else if (now_dir == 4) {
-            now_dir = 2;
-        }
-    } 
-    
-    // 오른쪽
-    else { 
-        if (now_dir == 1) {
-            now_dir = 3;
-        } else if (now_dir == 2) {
-            now_dir = 4;
-        } else if (now_dir == 3) {
-            now_dir = 2;
-        } else if (now_dir == 4) {
-            now_dir = 1;
-        }
-    }
-
-    return now_dir;
+    return next_direction[option][now_dir];
 }
 
 pii get_nextPos(int x, int y, int dir, int moves) {
     int mul = 1;
-    
-    if (dir == 1 || dir == 2) {
-        if (dir == 2) mul = -1;
+    if (dir % 2 == 0) mul = -1;
+
+    if (dir == 1 || dir == 2)
         y = y + mul * moves;
-    } else {
-        if (dir == 4) mul = -1;
+    else 
         x = x + mul * moves;
-    }
 
     return {x, y};
 }
@@ -135,6 +108,7 @@ int main() {
     cin >> finish.x >> finish.y >> finish.dir;
     start.count = 0;
 
+    // 좌표는 0, 0 부터 시작이지;
     --start.x;
     --start.y;
     --finish.x;
