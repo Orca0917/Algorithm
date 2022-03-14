@@ -4,14 +4,6 @@
 
 using namespace std;
 
-int get_score(char me, char you) {
-    if (me == you) return 1;
-    else if (me == 'S' && you == 'P') return 2;
-    else if (me == 'P' && you == 'R') return 2;
-    else if (me == 'R' && you == 'S') return 2;
-    else return 0;
-}
-
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
