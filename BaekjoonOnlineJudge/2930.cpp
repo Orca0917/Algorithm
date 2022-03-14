@@ -17,7 +17,7 @@ int main() {
     cin.tie(nullptr);
     cout.tie(nullptr);
     
-    int r; cin >> r;
+    int rounds; cin >> rounds;
     string p1; cin >> p1;
 
     int n; cin >> n;
@@ -26,21 +26,23 @@ int main() {
 
     int result = 0, max_result = 0;
 
-    // 상근이의 일반 점수
-    for (int you = 0; you < n; ++you)
-        for (int round = 0; round < r; ++round)
-            result += get_score(p1[round], p2[you][round]);
+    int s, r, p;
+    for (int round = 0; round < rounds; ++round) {
 
-    // 상근이의 최대 점수
-    int max_val = 0, round_score = 0;
-    for (int round = 0; round < r; ++round, max_val = 0) {
-        for (int j = 0; j < 3; ++j, round_score = 0) {
-            char me = "RSP"[j];
-            for (int you = 0; you < n; ++you)
-                round_score += get_score(me, p2[you][round]);
-            max_val = max(max_val, round_score);
+        s = r = p = 0;
+        for (int player = 0; player < n; ++player) {
+            if (p2[player][round] == 'S') ++s;
+            else if (p2[player][round] == 'P') ++p;
+            else ++r;
         }
-        max_result += max_val;
+
+        int ps = p * 2 + s, sr = s * 2 + r, rp = r * 2 + p;
+
+        if (p1[round] == 'S') result += ps;
+        else if (p1[round] == 'R') result += sr;
+        else result += rp;
+
+        max_result += max({ps, sr, rp});
     }
 
     cout << result << "\n" << max_result << "\n";
