@@ -4,30 +4,27 @@
 
 using namespace std;
 
-int mM[1000001];
-
+vector<int> mM(1000001, 0);
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    memset(mM, 0, sizeof(mM));
-
-    int n, m; cin >> n >> m;
-    int color_paper; cin >> color_paper;
-    int mis_color; cin >> mis_color;
+    int n, m, color_paper, mis_color;
+    cin >> n >> m >> color_paper >> mis_color;
 
     int lim = 0;
     for (int i = 0; i < mis_color; ++i) {
         int x, y; cin >> x >> y;
-        mM[y]= max(mM[y], x);
+        mM[y] = max(mM[y], x);
         lim = max(lim, x);
     }
 
     auto is_available = [&](const int mid) -> bool {
         int paper_cnt = 0;
 
-        // if (lim > mid) return false;
+        assert (lim > mid);
+
         for (int i = 0; i <= m; ++i) {
             if (mM[i] > 0) {
                 i += mid - 1;
