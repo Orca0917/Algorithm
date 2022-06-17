@@ -21,7 +21,7 @@ int MCMF(int source, int sink) {
     int max_cost = 0;
 
     while (true) {
-        vector<int> dist(MAX, -1);
+        vector<int> dist(MAX, INF);
         dist[source] = 0;
 
         vector<int> parent(MAX, -1);
@@ -39,7 +39,7 @@ int MCMF(int source, int sink) {
 
             isin_queue[here] = false;
             for (int there : adj[here]) {
-                if (capacity[here][there] - flow[here][there] > 0 && dist[there] < dist[here] + cost[here][there]) {
+                if (capacity[here][there] - flow[here][there] > 0 && dist[there] > dist[here] + cost[here][there]) {
                     dist[there] = dist[here] + cost[here][there];
                     parent[there] = here;
 
@@ -51,8 +51,8 @@ int MCMF(int source, int sink) {
         }
 
         if (parent[sink] == -1) break;
-        
-        int amount = 1e9;
+
+        int amount = INF;
         for (int node = sink; node != source; node = parent[node]) {
             amount = min(amount, capacity[parent[node]][node] - flow[parent[node]][node]);
         }
@@ -65,6 +65,7 @@ int MCMF(int source, int sink) {
             max_cost += amount * cost[parent[node]][node];
         }
 
+        // cout << "--result " << max_cost << "\n";
     }
 
     return max_cost;
@@ -107,21 +108,21 @@ int main() {
 
             for (int priority = 0; priority <= 3; ++priority) {
                 int company_idx; cin >> company_idx;
-                int company = company_idx + 141;
+                ++company_idx;
 
                 // link student to company
-                adj[student].push_back(company);
-                adj[company].push_back(student);
+                adj[student].push_back(140 + company_idx);
+                adj[140 + company_idx].push_back(student);
 
-                cost[student][company] = grade_statisfy_matrix[grade - 1][priority];
-                cost[company][student] = -grade_statisfy_matrix[grade - 1][priority];
+                cost[student][140 + company_idx] = -grade_statisfy_matrix[grade - 1][priority];
+                cost[140 + company_idx][student] = grade_statisfy_matrix[grade - 1][priority];
 
-                capacity[student][company] = 1;
+                capacity[student][140 + company_idx] = 1;
             }
         }
         
          // get answer with negative MCMF (maximize cost)
-        cout << MCMF(source, sink) << "\n";    
+        cout << -MCMF(source, sink) << "\n";    
     }
 
     
