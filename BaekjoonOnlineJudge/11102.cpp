@@ -5,11 +5,11 @@
 
 using namespace std;
 
-int n, m, f;
+int testcase, m, f;
 vector<int> adj[MAX];
 int capacity[MAX][MAX], flow[MAX][MAX];
 
-pii network_flow(int source, int sink) {
+int network_flow(int source, int sink) {
     memset(flow, 0, sizeof(flow));
 
     int max_flow = 0;
@@ -49,55 +49,59 @@ int main() {
     cin.tie(nullptr);
     cout.tie(nullptr);
     
-    cin >> n;
+    cin >> testcase;
+    while (testcase--) {
 
-    while (n--) {
-
+        // 변수 초기화
         memset(capacity, 0, sizeof(capacity));
         memset(flow, 0, sizeof(flow));
         for (int i = 0; i < MAX; ++i) adj[i].clear();
 
-
+        // 남자의 수, 여자의 수 입력
         cin >> m >> f;
-        // male : 1 <= m <= 100
-        // female : 101 <= f <= 150
 
         int source = 0, sink = 200;
 
-        // linking source to male
+        // SOURCE -> 남자
         for (int male = 1; male <= m; ++male) {
             adj[source].push_back(male);
             adj[male].push_back(source);
             capacity[source][male] = 1;    
         }
 
-        // linking male to female
+        // 남자 -> 여자
         for (int female = 101; female <= 100 + f; ++female) {
-            int k; cin >> k;
-            while (k--) {
+            int want_date; cin >> want_date;
+            while (want_date--) {
                 int male; cin >> male;
                 male += 1;
 
                 adj[female].push_back(male);
                 adj[male].push_back(female);
+                capacity[male][female] = 1;
             }
         }
 
-        // linking feamle to sink
+        // 여자 -> SINK
         for (int female = 101; female <= 100 + f; ++female) {
             adj[female].push_back(sink);
             adj[sink].push_back(female);
             capacity[female][sink] = 1e9;
         }
 
+        int result = network_flow(source, sink);
+        if (result != m) {
+            cout << "impossible\n";
+            continue;
+        }
+
+
+        // 한 명의 여자가 최대 몇 명의 남자와 데이트를 할 것인지 결정
         int lo = 1, hi = 200, answer = 1;
         while (lo <= hi) {
             int mid = (lo + hi) / 2;
             for (int female = 101; female <= 100 + f; ++female) {
-                for (int there : adj[female]) {
-                    if (there == sink) continue;
-                    capacity[there][female] = mid;
-                }
+                capacity[female][sink] = mid;
             }
 
             int result = network_flow(source, sink);
@@ -108,17 +112,8 @@ int main() {
                 lo = mid + 1;
             }
         }
-
-        for (int female = 101; female <= 100 + f; ++female) {
-            for (int there : adj[female]) {
-                if (there == sink) continue;
-                capacity[there][female] = answer;
-            }
-        }
-
-        int result = network_flow(source, sink);
-        if (result != m) cout << "impossible\n";
-        else cout <<  << "\n";
+        
+        cout << answer << "\n";
     }    
     
     return 0;
