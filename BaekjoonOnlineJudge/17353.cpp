@@ -8,7 +8,7 @@ int n; // 별이 떨어지는 점의 수
 int q; // 쿼리의 수
 
 struct Tree {
-    int value;
+    ll value;
     int lazy;
 };
 
@@ -45,7 +45,7 @@ void update_tree(int node, int start, int end, int left, int right, int value) {
     tree[node].value = tree[node * 2].value + tree[node * 2 + 1].value;
 }   
 
-int query_tree(int node, int start, int end, int left, int right) {
+ll query_tree(int node, int start, int end, int left, int right) {
 
     lazy_propagation(node, start, end);
 
