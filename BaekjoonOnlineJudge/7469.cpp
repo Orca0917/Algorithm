@@ -54,8 +54,9 @@ int main() {
 
     init_tree(1, 1, n);
 
+    int l, r, k;
     while (m--) {
-        int l, r, k; cin >> l >> r >> k;
+        cin >> l >> r >> k;
         int lo = -1e9, hi = 1e9;
 
         while (lo <= hi) {
