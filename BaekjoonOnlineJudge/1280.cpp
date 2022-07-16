@@ -5,11 +5,12 @@
 
 using namespace std;
 
-int N; // 나무의 개수
-const int max_coord = 200'000 - 1;
+int N;                          // 나무의 개수
+const int max_coord = 199'999;  // 최대 좌표
+ll answer = 1;                  // 나무를 심는데 드는 비용의 곱
 
-vector<pair<ll, int>> tree;   // merge-sort tree
-vector<int> x;      // 나무를 심을 위치
+vector<pair<ll, int>> tree;     // merge-sort tree
+vector<int> x;                  // 나무를 심을 위치
 
 
 pair<ll, int> update_tree(int node, int start, int end, int index) {
@@ -45,30 +46,28 @@ int main() {
 
     cin >> N;
 
+    x.resize(N);
+    for (int &e : x) cin >> e;
+
     int tree_height = (int)ceil(log2(max_coord + 1));
     int tree_size = 1 << (tree_height + 1);
     tree.resize(tree_size, {0LL, 0});
 
-    x.resize(N);
-    for (int &e : x) cin >> e;
-
-    ll answer = 1;
     update_tree(1, 0, max_coord, x[0]); // 첫번째 나무를 심는 것은 무료
 
     for (int i = 1; i < N; ++i) {
         pair<ll, int> L = query_tree(1, 0, max_coord, 0, max(x[i] - 1, 0));
         pair<ll, int> R = query_tree(1, 0, max_coord, min(x[i] + 1, max_coord), max_coord);
 
-        ll left_ret = L.second * x[i] - L.first;
-        ll right_ret = R.first - x[i] * R.second;
-
+        ll left_ret = 1LL * L.second * x[i] - L.first;
+        ll right_ret = R.first - 1LL * x[i] * R.second;
         ll result = (left_ret + right_ret) % MOD;
 
         answer *= result;
         answer %= MOD;
 
         update_tree(1, 0, max_coord, x[i]);
-    }    
+    }
 
     cout << answer << "\n";
     
