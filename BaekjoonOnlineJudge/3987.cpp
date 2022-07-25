@@ -10,13 +10,14 @@
 
 using namespace std;
 
-int N;      // 세로
-int M;      // 가로
-int curx;   // 보이저의 현재 위치
-int cury;   // 보이저의 현재 위치
+int N;                  // 세로
+int M;                  // 가로
+int curx;               // 보이저의 현재 위치
+int cury;               // 보이저의 현재 위치
 
-int use_cnt[MAX][MAX];
-char board[MAX][MAX];
+int use_cnt[MAX][MAX];  // 항성계를 몇 번 이용했는가?
+char board[MAX][MAX];   // 우주 지도
+
 int movement[4][2] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
 char c_dir[4] = {'U', 'R', 'D', 'L'};
 
@@ -24,38 +25,36 @@ char c_dir[4] = {'U', 'R', 'D', 'L'};
 int send_signal(int dir) {
     memset(use_cnt, 0, sizeof(use_cnt));
 
-    int duration = 0;
+    int ret = 0;
     int x = curx, y = cury;
 
     while (true) {
+
+        // 종료 조건
         if (x <= 0 || y <= 0 || x > N || y > M) break;
         if (board[x][y] == 'C') break;
 
-
+        // 방향 전환 1
         if (board[x][y] == '/') {
-            if (dir == UP) dir = RIGHT;
-            else if (dir == DOWN) dir = LEFT;
-            else if (dir == RIGHT) dir = UP;
-            else if (dir == LEFT) dir = DOWN;
+            if (dir == UP || dir == RIGHT) dir ^= (UP ^ RIGHT);
+            else dir ^= (LEFT ^ DOWN);
 
-            if (use_cnt[x][y] > 2) return -1;
-            ++use_cnt[x][y];
-        } else if (board[x][y] == '\\') {
-            if (dir == UP) dir = LEFT;
-            else if (dir == DOWN) dir = RIGHT;
-            else if (dir == RIGHT) dir = DOWN;
-            else if (dir == LEFT) dir = UP;
+            if (use_cnt[x][y]++ > 2) return -1;
+        } 
+        // 방향 전환 2
+        else if (board[x][y] == '\\') {
+            if (dir == UP || dir == LEFT) dir ^= (UP ^ LEFT);
+            else dir ^= (DOWN ^ RIGHT);
 
-            if (use_cnt[x][y] > 2) return -1;
-            ++use_cnt[x][y];
+            if (use_cnt[x][y]++ > 2) return -1;
         }
 
-        ++duration;
+        ++ret;
         x += movement[dir][0];
         y += movement[dir][1];
     }
 
-    return duration;
+    return ret;
 }
 
 int main() {
