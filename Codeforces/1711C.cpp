@@ -24,6 +24,8 @@ int check_possible(int val, ll targ) {
         if (result[i] > 2) over2 = true;
     }
 
+    // over2 : 마지막 1줄이 남는 경우를 채우기 위함
+    // targ가 2로 나누어 떨어지는 경우, over2가 필요x
     return (possible >= targ) && (over2 || targ % 2 == 0);
 }
 
