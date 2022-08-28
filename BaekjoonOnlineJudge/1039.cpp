@@ -34,9 +34,7 @@ int bfs() {
                 vis[temp_i][(c + 1) % 2] = true;
                 q.push({temp, c + 1});
 
-                if ((c + 1) % 2 == k % 2) {
-                    cand.push_back(temp_i);
-                }
+                if ((c + 1) % 2 == k % 2) cand.push_back(temp_i);
             }
         }
     }
