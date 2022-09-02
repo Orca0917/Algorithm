@@ -11,9 +11,9 @@ struct Q {
     char p;
 };
 
-int n, m, k;
-int boss_hp;
-int boss_x, boss_y;
+int n, m, k, atk;
+int boss_hp, boss_x, boss_y;
+char palyer;
 
 queue<Q> q;
 map<char, int> attk;
@@ -91,8 +91,6 @@ int main() {
     }
 
     for (int i = 0; i < k; ++i) {
-        char player;
-        int atk;
         cin >> player >> atk;
         attk[player] = atk;
     }
