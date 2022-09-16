@@ -32,7 +32,6 @@ int main() {
     for (auto &e : bag) cin >> e.first >> e.second;    
 
     memset(memo, -1, sizeof(memo));
-
     cout << dp(0, k) << "\n";
 
     return 0;
