@@ -8,6 +8,7 @@ vector<ll> tree;
 vector<int> arr;
 int n, m;
 
+
 ll init_tree(int node, int start, int end) {
     if (start == end) return tree[node] = arr[start];
 
@@ -15,6 +16,7 @@ ll init_tree(int node, int start, int end) {
     return tree[node] = init_tree(node * 2, start, mid) + \
                         init_tree(node * 2 + 1, mid + 1, end);
 }
+
 
 void update_tree(int node, int start, int end, int index, int diff) {
     if (index < start || end < index) return;
@@ -27,6 +29,7 @@ void update_tree(int node, int start, int end, int index, int diff) {
         update_tree(node * 2 + 1, mid + 1, end, index, diff);
     }
 }
+
 
 ll query_tree(int node, int start, int end, int left, int right) {
     if (right < start || end < left) return 0;
