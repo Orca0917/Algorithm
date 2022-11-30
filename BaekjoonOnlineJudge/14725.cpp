@@ -7,7 +7,7 @@ using namespace std;
 struct NODE {
     map<string, NODE*> childs;
 
-    void insert(queue<string> q) {
+    void insert(queue<string> &q) {
         string now = q.front(); q.pop();
 
         if (childs.find(now) == childs.end())
