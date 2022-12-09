@@ -1,14 +1,14 @@
 #include <bits/stdc++.h>
 #define ll long long
+#define uint unsigned int
 #define pii pair<int, int>
 #define MAX 500'001
-#define MOD (1LL << 32)
 using namespace std;
 
 struct Tree {
-    ll value;
-    int lazy_add;
-    int lazy_mul;
+    uint value;
+    uint lazy_add;
+    uint lazy_mul;
 };
 
 int n, q;
@@ -16,13 +16,13 @@ int n, q;
 vector<int> adj[MAX];
 vector<Tree> tree;
 
-int hld_in[MAX];
-int hld_out[MAX];
+int hld_start[MAX];
+int hld_end[MAX];
 int hld_parent[MAX];
 int hld_head[MAX];
 int hld_depth[MAX];
 int hld_cnt = 1;
-
+ 
 int subtree_size[MAX];
 
 
@@ -40,7 +40,7 @@ void calc_subtree(int here, int parent) {
 
 
 void hld(int here, int parent, int depth) {
-    hld_in[here] = hld_cnt++;
+    hld_start[here] = hld_cnt++;
     hld_depth[here] = depth;
 
     for (int there : adj[here]) {
@@ -58,33 +58,20 @@ void hld(int here, int parent, int depth) {
         }
     }
 
-    hld_out[here] = hld_cnt;
+    hld_end[here] = hld_cnt - 1;
 }
 
 
 void lazy_propagation(int node, int start, int end) {
     if (tree[node].lazy_mul != 1 || tree[node].lazy_add != 0) {
-        tree[node].value *= tree[node].lazy_mul;
-        tree[node].value %= MOD; 
-        tree[node].value += (end - start + 1) * tree[node].lazy_add;
-        tree[node].value %= MOD;
+        tree[node].value = tree[node].lazy_mul * tree[node].value + (end - start + 1) * tree[node].lazy_add;
 
         if (start != end) {
-            tree[node * 2].lazy_mul *= tree[node].lazy_mul;
-            tree[node * 2].lazy_mul %= MOD;
+            tree[node * 2].lazy_mul = (tree[node * 2].lazy_mul * tree[node].lazy_mul);
+            tree[node * 2 + 1].lazy_mul = (tree[node * 2 + 1].lazy_mul * tree[node].lazy_mul);
 
-            tree[node * 2 + 1].lazy_mul *= tree[node].lazy_mul;
-            tree[node * 2 + 1].lazy_mul %= MOD;
-
-            tree[node * 2].lazy_add *= tree[node].lazy_mul;
-            tree[node * 2].lazy_add %= MOD;
-            tree[node * 2].lazy_add += tree[node].lazy_add;
-            tree[node * 2].lazy_add %= MOD;
-
-            tree[node * 2 + 1].lazy_add *= tree[node].lazy_mul;
-            tree[node * 2 + 1].lazy_add %= MOD;
-            tree[node * 2 + 1].lazy_add += tree[node].lazy_add;
-            tree[node * 2 + 1].lazy_add %= MOD;
+            tree[node * 2].lazy_add = (tree[node * 2].lazy_add * tree[node].lazy_mul + tree[node].lazy_add);
+            tree[node * 2 + 1].lazy_add = (tree[node * 2 + 1].lazy_add * tree[node].lazy_mul + tree[node].lazy_add);
         }
 
         tree[node].lazy_add = 0;
@@ -109,11 +96,10 @@ void update_tree(int node, int start, int end, int left, int right, int mul, int
     update_tree(node * 2 + 1, mid + 1, end, left, right, mul, add);
 
     tree[node].value = tree[node * 2].value + tree[node * 2 + 1].value;
-    tree[node].value %= MOD;
 }
 
 
-ll query_tree(int node, int start, int end, int left, int right) {
+uint query_tree(int node, int start, int end, int left, int right) {
     lazy_propagation(node, start, end);
 
     if (right < start || end < left) return 0;
@@ -121,7 +107,7 @@ ll query_tree(int node, int start, int end, int left, int right) {
 
     int mid = (start + end) / 2;
     return (query_tree(node * 2, start, mid, left, right) + \
-           query_tree(node * 2 + 1, mid + 1, end, left, right)) % MOD;
+           query_tree(node * 2 + 1, mid + 1, end, left, right));
 }
 
 
@@ -143,9 +129,8 @@ int main() {
     tree.resize(tree_size);
 
     calc_subtree(1, 0);
-    hld_head[1] = 1;
+    hld_head[1] = 0;
     hld(1, 0, 1);
-    
 
     int x, y, v;
     while (q--) {
@@ -153,56 +138,55 @@ int main() {
 
         if (option == 1) {
             cin >> x >> v;
-            update_tree(1, 1, n, hld_in[x], hld_out[x], 1, v);
+            update_tree(1, 1, n, hld_start[x], hld_end[x], 1, v);
         }
 
         else if (option == 2) {
             cin >> x >> y >> v;
             while (hld_head[x] != hld_head[y]) {
                 if (hld_depth[hld_head[x]] < hld_depth[hld_head[y]]) swap(x, y);
-                update_tree(1, 1, n, hld_in[hld_head[x]], hld_in[x], 1, v);
+                update_tree(1, 1, n, hld_start[hld_head[x]], hld_start[x], 1, v);
                 x = hld_parent[x];
             }
 
-            if (hld_depth[x] > hld_depth[y]) swap(x, y);
-            update_tree(1, 1, n, hld_in[x], hld_in[y], 1, v);
+            if (hld_start[x] > hld_start[y]) swap(x, y);
+            update_tree(1, 1, n, hld_start[x], hld_start[y], 1, v);
         }
 
         else if (option == 3) {
             cin >> x >> v;
-            update_tree(1, 1, n, hld_in[hld_head[x]], hld_in[x], v, 0);
+            update_tree(1, 1, n, hld_start[x], hld_end[x], v, 0);
         }
 
         else if (option == 4) {
             cin >> x >> y >> v;
             while (hld_head[x] != hld_head[y]) {
                 if (hld_depth[hld_head[x]] < hld_depth[hld_head[y]]) swap(x, y);
-                update_tree(1, 1, n, hld_in[hld_head[x]], hld_in[x], v, 0);
+                update_tree(1, 1, n, hld_start[hld_head[x]], hld_start[x], v, 0);
                 x = hld_parent[x];
             }
 
-            if (hld_depth[x] > hld_depth[y]) swap(x, y);
-            update_tree(1, 1, n, hld_in[x], hld_in[y], v, 0);
+            if (hld_start[x] > hld_start[y]) swap(x, y);
+            update_tree(1, 1, n, hld_start[x], hld_start[y], v, 0);
         }
 
         else if (option == 5) {
             cin >> x;
-            cout << query_tree(1, 1, n, hld_in[x], hld_out[x]) << "\n";
+            cout << query_tree(1, 1, n, hld_start[x], hld_end[x]) << "\n";
         }
 
         else if (option == 6) {
             cin >> x >> y;
-            int result = 0;
+            uint result = 0;
             
             while (hld_head[x] != hld_head[y]) {
                 if (hld_depth[hld_head[x]] < hld_depth[hld_head[y]]) swap(x, y);
-                result += query_tree(1, 1, n, hld_in[hld_head[x]], hld_in[x]);
-                result %= MOD;
+                result += query_tree(1, 1, n, hld_start[hld_head[x]], hld_start[x]);
                 x = hld_parent[x];
             }
-            if (hld_depth[x] > hld_depth[y]) swap(x, y);
-            result += query_tree(1, 1, n, hld_in[x], hld_in[y]);
-            cout << result % MOD << "\n";
+            if (hld_start[x] > hld_start[y]) swap(x, y);
+            result += query_tree(1, 1, n, hld_start[x], hld_start[y]);
+            cout << result << "\n";
         }
     }
     return 0;
