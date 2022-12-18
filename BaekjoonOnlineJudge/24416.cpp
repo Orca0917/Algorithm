@@ -12,7 +12,7 @@ ll dp(int x) {
     ll &ret = memo[x];
     if (ret != -1) return ret;
 
-    ret = dp(x - 2) + dp(x - 1);
+    return ret = dp(x - 2) + dp(x - 1);
 }
 
 int main() {
