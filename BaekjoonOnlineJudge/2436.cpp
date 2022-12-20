@@ -24,6 +24,5 @@ int main() {
     }
     cout << answer.first << " " << answer.second << "\n";
 
-    
     return 0;
 }
