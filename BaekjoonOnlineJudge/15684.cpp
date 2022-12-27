@@ -7,34 +7,34 @@ using namespace std;
 int n, h, m, answer = 4;
 bool ladder[11][31];
 
-bool go(int index) {
+bool go(int target) {
 
-    int id = index;
+    int cur = target;
     int now = 1;
 
     while (now <= h) {
-        if (ladder[id - 1][now]) --id;
-        else if (ladder[id][now]) ++id;
+        if (ladder[cur - 1][now]) --cur;
+        else if (ladder[cur][now]) ++cur;
         ++now;
     }
 
-    return (id == index);
+    return (cur == target);
 }
 
-void back_track(int depth, int stick, int cnt) {
-    if (stick == cnt) {
+void back_track(int depth, int add, int cnt) {
+    if (add == cnt) {
         bool result = true;
         for (int i = 1; i <= n && result; ++i) result &= go(i);
-        if (result) answer = stick;
+        if (result) answer = add;
         return;
     }
 
     for (int d = depth; d <= h; ++d) {
-        for (int index = 1; index <= n; ++index) {
-            if (ladder[index - 1][d] | ladder[index][d] | ladder[index + 1][d]) continue;
-            ladder[index][d] = true;
-            back_track(d, stick, cnt + 1);
-            ladder[index][d] = false;
+        for (int cur = 1; cur <= n; ++cur) {
+            if (ladder[cur - 1][d] | ladder[cur][d] | ladder[cur + 1][d]) continue;
+            ladder[cur][d] = true;
+            back_track(d, add, cnt + 1);
+            ladder[cur][d] = false;
         }
     }
 }
@@ -53,9 +53,9 @@ int main() {
         ladder[b][a] = true;
     }
 
-    for (int i = 0; i <= 3; ++i) {
+    for (int add = 0; add <= 3; ++add) {
         if (answer != 4) break;
-        back_track(1, i, 0);
+        back_track(1, add, 0);
     }
 
     cout << (answer == 4 ? -1 : answer) << "\n";
