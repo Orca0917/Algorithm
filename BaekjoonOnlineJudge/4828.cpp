@@ -64,7 +64,7 @@ string check_syntax(string s) {
             
             // amp 가 포함된 태그 생성
             string token = "";
-            while (i < slen && s[i] != ';') token += s[i++];
+            while (i < slen - 1 && s[i] != ';') token += s[i++];
             token += s[i];
 
             if (token == "&lt;" || token == "&gt;" || token == "&amp;") ;
